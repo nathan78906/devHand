@@ -36,10 +36,11 @@ def assistant():
         if json_search_data["items"]:
             top_result_id = json_search_data["items"][0]["question_id"]
 
-            url_answer = "https://api.stackexchange.com/2.2/questions/{}/answers?order=desc&sort=votes&site=stackoverflow&filter=!9Z(-wzu0T&key={}".format(top_result_id, key)
+            url_answer = "https://api.stackexchange.com/2.2/questions/{}/answers?order=desc&sort=votes&site=stackoverflow&filter=!-*jbN.9m(dML&key={}".format(top_result_id, key)
             answer_response = requests.get(url=url_answer)
             json_answer_data = answer_response.json()
             body = json_answer_data["items"][0]["body"]
+            answer_link = json_answer_data["items"][0]["link"]
 
             body_parsed = re.sub('<[^<]+?>', '', body)
 
