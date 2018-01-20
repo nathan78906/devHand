@@ -33,27 +33,34 @@ def assistant():
         url = "https://api.stackexchange.com/2.2/search/advanced?order=desc&sort=votes&site=stackoverflow&q={}&key={}".format(query, key)
         search_response = requests.get(url=url)
         json_search_data = search_response.json()
-        top_result_id = json_search_data["items"][0]["question_id"]
+        if json_search_data["items"]:
+            top_result_id = json_search_data["items"][0]["question_id"]
 
+            url_answer = "https://api.stackexchange.com/2.2/questions/{}/answers?order=desc&sort=votes&site=stackoverflow&filter=!9Z(-wzu0T&key={}".format(top_result_id, key)
+            answer_response = requests.get(url=url_answer)
+            json_answer_data = answer_response.json()
+            body = json_answer_data["items"][0]["body"]
 
-        url_answer = "https://api.stackexchange.com/2.2/questions/{}/answers?order=desc&sort=votes&site=stackoverflow&filter=!9Z(-wzu0T&key={}".format(top_result_id, key)
-        answer_response = requests.get(url=url_answer)
-        json_answer_data = answer_response.json()
-        body = json_answer_data["items"][0]["body"]
+            body_parsed = re.sub('<[^<]+?>', '', body)
 
-        body_parsed = re.sub('<[^<]+?>', '', body)
+            short_body = ' '.join(body_parsed.split(" ")[:20]) + "..."
 
-        search_response = requests.get(url=url)
-        json_search_data = search_response.json()
-
-        socketio.emit("stackoverflow", {"devHand": True, "query": query})
-        return jsonify({
-            "speech": "Getting results from stack overflow dot com",
-            "displayText": body_parsed,
-            "data": {},
-            "contextOut": [],
-            "source": ""
-        })
+            socketio.emit("stackoverflow", {"devHand": True, "query": query})
+            return jsonify({
+                "speech": short_body,
+                "displayText": short_body,
+                "data": {},
+                "contextOut": [],
+                "source": ""
+            })
+        else:
+            return jsonify({
+                "speech": "Sorry, we didn't find any results for that search.",
+                "displayText": "Sorry, we didn't find any results for that search.",
+                "data": {},
+                "contextOut": [],
+                "source": ""
+            })
 
 if __name__ == "__main__":
     socketio.run(app)
