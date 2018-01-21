@@ -39,22 +39,31 @@ def assistant():
             url_answer = "https://api.stackexchange.com/2.2/questions/{}/answers?order=desc&sort=votes&site=stackoverflow&filter=!-*jbN.9m(dML&key={}".format(top_result_id, key)
             answer_response = requests.get(url=url_answer)
             json_answer_data = answer_response.json()
-            body = json_answer_data["items"][0]["body"]
-            answer_link = json_answer_data["items"][0]["link"]
+            if json_answer_data["items"]:
+                body = json_answer_data["items"][0]["body"]
+                answer_link = json_answer_data["items"][0]["link"]
 
-            body_parsed = re.sub('<[^<]+?>', '', body)
+                body_parsed = re.sub('<[^<]+?>', '', body)
 
-            short_body = ' '.join(body_parsed.split(" ")[:20]) + "..."
-            print(short_body)
+                short_body = ' '.join(body_parsed.split(" ")[:20]) + "..."
+                print(short_body)
 
-            socketio.emit("stackoverflow", {"devHand": True, "query": query, "link": answer_link, "html": body})
-            return jsonify({
-                "speech": short_body,
-                "displayText": short_body,
-                "data": {},
-                "contextOut": [],
-                "source": ""
-            })
+                socketio.emit("stackoverflow", {"devHand": True, "query": query, "link": answer_link, "html": body})
+                return jsonify({
+                    "speech": short_body,
+                    "displayText": short_body,
+                    "data": {},
+                    "contextOut": [],
+                    "source": ""
+                })
+            else:
+                return jsonify({
+                    "speech": "It looks like there aren't any answers to that question. Big mystery!",
+                    "displayText": "It looks like there aren't any answers to that question. Big mystery!",
+                    "data": {},
+                    "contextOut": [],
+                    "source": ""
+                })
         else:
             return jsonify({
                 "speech": "Sorry, we didn't find any results for that search.",
