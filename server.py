@@ -41,6 +41,7 @@ def assistant():
             if json_answer_data["items"]:
                 body = json_answer_data["items"][0]["body"]
                 answer_link = json_answer_data["items"][0]["link"]
+                score = json_answer_data["items"][0]["score"]
 
                 body_parsed = re.sub(r'<[^<]+?>', '', body)
 
@@ -55,7 +56,7 @@ def assistant():
                 body_spoken = ' '.join(body_spoken.split(" ")[:20]) + ". Read more on your PC."
                 print("body_spoken:", body_spoken)
 
-                socketio.emit("stackoverflow", {"devHand": True, "query": query, "link": answer_link, "html": body})
+                socketio.emit("stackoverflow", {"devHand": True, "query": query, "link": answer_link, "html": body, "score": score})
                 return jsonify({
                     "speech": body_spoken,
                     "displayText": short_body,
