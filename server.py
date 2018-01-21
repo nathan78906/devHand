@@ -45,8 +45,9 @@ def assistant():
             body_parsed = re.sub('<[^<]+?>', '', body)
 
             short_body = ' '.join(body_parsed.split(" ")[:20]) + "..."
+            print(short_body)
 
-            socketio.emit("stackoverflow", {"devHand": True, "query": query})
+            socketio.emit("stackoverflow", {"devHand": True, "query": query, "link": answer_link, "html": body})
             return jsonify({
                 "speech": short_body,
                 "displayText": short_body,
