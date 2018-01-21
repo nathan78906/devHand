@@ -10,6 +10,23 @@ key = "nGbD1fk2wjuOI2YdZ9w0Rg(("
 app = Flask(__name__)
 socketio = SocketIO(app)
 
+
+class MLStripper(HTMLParser):
+    def __init__(self):
+        self.reset()
+        self.strict = False
+        self.convert_charrefs= True
+        self.fed = []
+    def handle_data(self, d):
+        self.fed.append(d)
+    def get_data(self):
+        return ''.join(self.fed)
+
+def strip_tags(html):
+    s = MLStripper()
+    s.feed(html)
+    return s.get_data()
+
 @app.route("/")
 def hello():
     return "Hello World!"
@@ -47,16 +64,20 @@ def assistant():
 
                 short_body = ' '.join(body_parsed.split(" ")[:20]) + "..."
                 
-                body_spoken = re.sub(r'\<pre\>.*\</pre\>', '', body)
-                body_spoken = re.sub(r'\<code\>.*\</code\>', '', body_spoken)
+                body_spoken = re.sub(r'\<pre\>.*?\</pre\>', '', body)
+                body_spoken = re.sub(r'\<code\>.*?\</code\>', '', body_spoken)
                 # body_spoken = re.sub(r'\<a.*\>(?P<text>.*)\</a\>', r'(\g<text>)', body_spoken)
                 # body_spoken = re.sub(r'\<img.*\>', '', body_spoken)
-                body_spoken = re.sub(r'<[^<]+?>', '', body_spoken)
-                body_spoken = HTMLParser().unescape(body_spoken)
+                # body_spoken = re.sub(r'<[^<]+?>', '', body_spoken)
+                # body_spoken = HTMLParser().unescape(body_spoken)
+                body_spoken = strip_tags(body_spoken)
                 body_spoken = ' '.join(body_spoken.split(" ")[:20]) + ". Read more on your PC."
                 print("body_spoken:", body_spoken)
 
-                socketio.emit("stackoverflow", {"devHand": True, "query": query, "link": answer_link, "html": body, "score": score})
+                socketio.emit("stackoverflow", {"devHand": True, "query": query, "answers": 
+                    [{"link": i["link"],
+                      "html": i["body"],
+                      "score": i["score"]} for i in json_answer_data["items"][:3]]})
                 return jsonify({
                     "speech": body_spoken,
                     "displayText": short_body,
