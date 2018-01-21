@@ -1,6 +1,6 @@
 from flask import Flask, jsonify, request
 from flask_socketio import SocketIO
-
+from html.parser import HTMLParser
 import requests
 import json
 import re
@@ -17,7 +17,6 @@ def hello():
 @app.route("/assistant", methods=["POST"])
 def assistant():
     action = request.get_json()["result"]["action"]
-    print(action)
     if action == "message.sendtest":
         socketio.emit("thing", {"devHand": True})
         return jsonify({
@@ -49,10 +48,12 @@ def assistant():
                 
                 body_spoken = re.sub(r'\<pre\>.*\</pre\>', '', body)
                 body_spoken = re.sub(r'\<code\>.*\</code\>', '', body_spoken)
-                body_spoken = re.sub(r'\<a.*\>(?P<text>.*)\</a\>', r'(\g<text>)', body_spoken)
-                body_spoken = re.sub(r'\<img.*\>', '', body_spoken)
+                # body_spoken = re.sub(r'\<a.*\>(?P<text>.*)\</a\>', r'(\g<text>)', body_spoken)
+                # body_spoken = re.sub(r'\<img.*\>', '', body_spoken)
                 body_spoken = re.sub(r'<[^<]+?>', '', body_spoken)
+                body_spoken = HTMLParser().unescape(body_spoken)
                 body_spoken = ' '.join(body_spoken.split(" ")[:20]) + ". Read more on your PC."
+                print("body_spoken:", body_spoken)
 
                 socketio.emit("stackoverflow", {"devHand": True, "query": query, "link": answer_link, "html": body})
                 return jsonify({
