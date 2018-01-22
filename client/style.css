@@ -1,0 +1,31 @@
+@import url('https://fonts.googleapis.com/css?family=Roboto+Mono|Roboto:400,400i,700');
+
+body {
+    margin: 5px;
+    font-family: Roboto, sans-serif;
+    color: #222;
+    font-size: 16px;
+}
+
+pre, code, kbd {
+    background: #ddc;
+    font-family: "Roboto Mono", Courier, monospace;
+    padding: 2px;
+    border-radius: 1px;
+}
+
+pre {
+    display: block;
+}
+
+.answer {
+    border: 1px solid #f39c12;
+    border-radius: 3px;
+    padding: 5px;
+    margin: 10px;
+}
+
+.answer-heading {
+    font-weight: 700;
+    font-size: 14px;
+}

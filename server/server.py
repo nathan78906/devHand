@@ -5,7 +5,8 @@ import requests
 import json
 import re
 
-key = "nGbD1fk2wjuOI2YdZ9w0Rg(("
+# Create a stackoverflow app and input key here
+key = ""
 
 app = Flask(__name__)
 socketio = SocketIO(app)
